@@ -38,3 +38,10 @@ Check: how to confirm it still holds.
 ```
 
 <!-- entries below, newest last -->
+
+## C-001 — pstack-economy: lean-by-default spending, two-family routing  [active]
+Intent: a pstack-economy skill defines lean widths for duplicated agent work (divided work untouched), per-task go-wide approval with a cost statement against each quota, routing by tier over the setup-pstack inventory where duplicated-work seats at lean width and every author/verifier pair span the Claude and Codex families when Codex is available (divided work may use Codex by headroom but need not mix), and the audit tick as a background watcher.
+Why: both Claude Code and Codex are subscription quotas; the saving comes from smaller widths, and model choice serves heterogeneity, not price.
+Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
+Touches: skills/pstack-economy/SKILL.md, tests/test_skills.py
+Check: python3 -m unittest tests.test_skills.EconomySkillTest passes
