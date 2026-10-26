@@ -1,3 +1,5 @@
+> **This is scotu/pstack-claude-code**, pstack built for Claude Code. Install it with `claude plugin marketplace add scotu/pstack-claude-code` and `claude plugin install pstack@scotu-pstack`. It runs lean by default (`skills/pstack-economy`): the panel and lane widths described here are the go-wide forms, used when you approve them for a task. Cursor-only features map to Claude Code through `docs/harness/claude-code.md`.
+
 # Understand the code before changing it
 
 Editing code you don't understand is how subtle regressions ship, and that's as true for the agent as for you. Agents usually fail in one of two ways. They misread what you want, or they don't have the context to do the work right. [What goes in a prompt](./02-poteto-mode.md#what-goes-in-a-prompt) handles the first. This page handles the second.

@@ -4,6 +4,8 @@ description: "Find what a change could break somewhere else before it ships, bey
 disable-model-invocation: true
 ---
 
+In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+
 # Blast radius
 
 Find what a change breaks somewhere else, before it ships. Use for "blast radius of X", "what could this break", or reviewing a small diff you don't trust yet.

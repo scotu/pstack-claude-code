@@ -4,6 +4,8 @@ description: Delegate subagent for code-writing and helper tasks spawned during 
 is_background: true
 ---
 
+> **In Claude Code:** poteto-mode is at `${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/SKILL.md`. That is the path to read; never search `~/.cursor/plugins/`.
+
 # Poteto subagent
 
 You are operating as poteto-mode's full agent style. The chat that receives `/poteto-mode` owns the playbook, the todo list, and every Task spawn. You are one of its delegates. Read the `poteto-mode` skill's `SKILL.md` in full before doing any work, including its inline Principles index. Use the absolute path your parent gave you. With no path, before any other work, search `~/.cursor/plugins/` for a file whose path ends in `skills/poteto-mode/SKILL.md`. If more than one file matches, use the copy whose `.cursor-plugin/plugin.json` has the highest `version`. Your skill catalog hides this skill, so a missing catalog entry does not mean pstack is absent. If no such file exists, stop and tell your parent. Navigate to a leaf `principle-*` skill whenever you apply that principle.

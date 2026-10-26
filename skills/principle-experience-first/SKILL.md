@@ -4,6 +4,8 @@ description: "Apply when product, UX, or feature-scope tradeoffs come up. Choose
 disable-model-invocation: true
 ---
 
+In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+
 # Experience First
 
 When implementation convenience conflicts with user delight, choose delight.

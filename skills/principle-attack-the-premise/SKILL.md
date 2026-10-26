@@ -4,6 +4,8 @@ description: "Apply when two or more fixes that share one premise have failed th
 disable-model-invocation: true
 ---
 
+In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+
 # Attack the Premise
 
 When two or more fixes that share one premise have failed the same gate, suspect the premise, not the fixes.

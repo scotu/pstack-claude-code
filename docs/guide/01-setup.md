@@ -1,3 +1,5 @@
+> **This is scotu/pstack-claude-code**, pstack built for Claude Code. Install it with `claude plugin marketplace add scotu/pstack-claude-code` and `claude plugin install pstack@scotu-pstack`. It runs lean by default (`skills/pstack-economy`): the panel and lane widths described here are the go-wide forms, used when you approve them for a task. Cursor-only features map to Claude Code through `docs/harness/claude-code.md`.
+
 # Set up pstack
 
 In this page you install the plugin, pick which models pstack uses, and run your first task. Setup is one command plus a short conversation.

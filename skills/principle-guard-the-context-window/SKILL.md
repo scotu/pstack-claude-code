@@ -4,6 +4,8 @@ description: "Apply when context is filling up: large outputs, long files, repea
 disable-model-invocation: true
 ---
 
+In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+
 # Guard the Context Window
 
 **Why:** Context overflow degrades reasoning quality, creates compression artifacts, and halts progress.

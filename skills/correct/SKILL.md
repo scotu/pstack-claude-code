@@ -4,6 +4,8 @@ description: "Find the mistakes agents keep repeating in this repo and make each
 disable-model-invocation: true
 ---
 
+In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+
 # Correct
 
 The operator keeps correcting agents in this repo for the same mistakes. Change the repo so the next agent can't make them.

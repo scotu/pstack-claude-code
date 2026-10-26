@@ -4,6 +4,8 @@ description: "Apply before writing logic: choosing core types and data structure
 disable-model-invocation: true
 ---
 
+In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md) once per session before you follow this skill. It maps the Cursor names in pstack skills to Claude Code.
+
 # Foundational Thinking
 
 **Structural decisions** protect option value. **Code-level decisions** protect simplicity.

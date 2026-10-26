@@ -1,3 +1,5 @@
+> **This is scotu/pstack-claude-code**, pstack built for Claude Code. Install it with `claude plugin marketplace add scotu/pstack-claude-code` and `claude plugin install pstack@scotu-pstack`. It runs lean by default (`skills/pstack-economy`): the panel and lane widths described here are the go-wide forms, used when you approve them for a task. Cursor-only features map to Claude Code through `docs/harness/claude-code.md`.
+
 # Steer with principle names
 
 pstack ships 24 principles as individual skills. `/poteto-mode` reads their index at the start of every multi-step task, applies the ones the task triggers, and names each applied principle in its reply along with the decision it changed.
