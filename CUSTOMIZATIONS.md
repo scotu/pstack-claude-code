@@ -57,8 +57,8 @@ Check: python3 -m unittest tests.test_skills.OnAdapterHookTest passes
 Intent: programs arm a background watcher (pstack-audit-watch.py --watch via Bash run_in_background, never Monitor) that does mechanical liveness checks for free and exits only on a change, waking the root for the judgment half; the hourly /loop 1h root tick only when going wide. check-plan.mjs accepts /loop 1h or pstack-audit-watch as the program marker.
 Why: an hourly tick on a subscription model re-audits unchanged state; mechanical checks need no model, and judgment is needed only when something changed.
 Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
-Touches: skills/pstack-economy/SKILL.md, skills/pstack-economy/audit-watch/
-Check: python3 -m unittest tests.test_audit_watch passes
+Touches: skills/pstack-economy/SKILL.md, skills/pstack-economy/audit-watch/, skills/poteto-mode/playbooks/multi-phase-plan.md, skills/poteto-mode/playbooks/autopilot-full.md, skills/poteto-mode/scripts/check-plan.mjs
+Check: python3 -m unittest tests.test_audit_watch tests.test_check_plan tests.test_principles.EconomyPrincipleTest passes
 
 ## C-003 — setup-pstack: two-family inventory and panel defaults  [active]
 Intent: setup-pstack builds a confirmed inventory of Claude and Codex models (family, tier, tools, executor, cost class), detects Codex with codex --version and codex login status, uses a Codex effort ladder without max, writes ~/.claude/rules/pstack-models.md with the inventory as comment lines, and defaults every panel (arena runners, interrogate reviewers, architect runners) to one Claude and one Codex entry, with grok slugs written as codex default; Claude-only with a note when Codex is missing. pstack-economy names how many panel entries run at lean width.
@@ -66,3 +66,10 @@ Why: model diversity across families is the point of the panels; lean widths kee
 Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
 Touches: skills/setup-pstack/SKILL.md, skills/pstack-economy/SKILL.md
 Check: python3 -m unittest tests.test_skills.SetupInventoryTest passes
+
+## C-004 — poteto-mode: one live lane per distinct check  [active]
+Intent: multi-phase plans run one live-verification lane per distinct check (no repeats) and state "(N lanes)"; ten lanes only when going wide. check-plan.mjs accepts both phrasings and requires lanes numbered exactly 1..N.
+Why: ten lanes repeat about five distinct checks; the repeats spend quota without adding coverage.
+Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
+Touches: skills/poteto-mode/scripts/check-plan.mjs, skills/poteto-mode/playbooks/multi-phase-plan.md
+Check: python3 -m unittest tests.test_check_plan tests.test_principles.EconomyPrincipleTest passes
