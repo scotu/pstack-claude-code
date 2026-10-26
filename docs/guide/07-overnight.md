@@ -1,3 +1,5 @@
+> **This is scotu/pstack-claude-code**, pstack built for Claude Code. Install it with `claude plugin marketplace add scotu/pstack-claude-code` and `claude plugin install pstack@scotu-pstack`. It runs lean by default (`skills/pstack-economy`): the panel and lane widths described here are the go-wide forms, used when you approve them for a task. Cursor-only features map to Claude Code through `docs/harness/claude-code.md`.
+
 # Run work while you sleep
 
 This is the payoff for everything before it. An agent you can trust to verify its own work is an agent you can leave alone with a hard task. What makes that safe isn't hope. It's a checkable finish condition, an isolated worktree or cloud agent, and a decision log you audit in the morning.
