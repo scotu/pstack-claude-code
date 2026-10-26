@@ -1,0 +1,13 @@
+{
+  "name": "scotu-pstack",
+  "owner": {
+    "name": "scotu"
+  },
+  "plugins": [
+    {
+      "name": "pstack",
+      "source": "./",
+      "description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence. (pstack 0.15.32, upstream c5149ef)"
+    }
+  ]
+}
