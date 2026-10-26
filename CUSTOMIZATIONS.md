@@ -59,3 +59,10 @@ Why: an hourly tick on a subscription model re-audits unchanged state; mechanica
 Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
 Touches: skills/pstack-economy/SKILL.md, skills/pstack-economy/audit-watch/
 Check: python3 -m unittest tests.test_audit_watch passes
+
+## C-003 — setup-pstack: two-family inventory and panel defaults  [active]
+Intent: setup-pstack builds a confirmed inventory of Claude and Codex models (family, tier, tools, executor, cost class), detects Codex with codex --version and codex login status, uses a Codex effort ladder without max, writes ~/.claude/rules/pstack-models.md with the inventory as comment lines, and defaults every panel (arena runners, interrogate reviewers, architect runners) to one Claude and one Codex entry, with grok slugs written as codex default; Claude-only with a note when Codex is missing. pstack-economy names how many panel entries run at lean width.
+Why: model diversity across families is the point of the panels; lean widths keep the cost down.
+Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
+Touches: skills/setup-pstack/SKILL.md, skills/pstack-economy/SKILL.md
+Check: python3 -m unittest tests.test_skills.SetupInventoryTest passes

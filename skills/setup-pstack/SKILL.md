@@ -9,6 +9,36 @@ In Claude Code, read [the Claude Code adapter](../../docs/harness/claude-code.md
 
 Write `~/.cursor/rules/pstack-models.mdc`, an always-applied rule that sets pstack's model per role.
 
+## On this fork: inventory and two families
+
+This build runs on Claude Code with Codex as a second model family. These rules change the steps below. Where they differ, these rules win.
+
+**Inventory (before step 1).**
+- **Detect Claude models** as the adapter's setup-pstack section says: the `Agent` tool's `model` values and their efforts.
+- **Detect Codex:** `codex --version` and `codex login status`. When both pass, ask the user which Codex models they want pstack to use. Never assume a catalog. `default` means Codex's own configured model, run with no `-m`.
+- **Confirm each model** with the user, with these fields:
+  - family: `claude` or `codex`;
+  - tier: `frontier`, `strong` or `light`;
+  - `tools`: yes or no;
+  - executor: `agent <model> <effort>` or `codex <model> <effort>`;
+  - cost class: `subscription` unless the user says otherwise.
+- **Recommend slots.** `frontier` for judgment, a `strong` model from each family for code-writing and review, and a `light` Claude model (`haiku` or `sonnet`) for the Codex wrapper.
+
+**Budget (step 3).** Claude models use the adapter's ladder. Codex efforts are `xhigh` > `high` > `medium` > `low` > `minimal`, with no `max`, so `unlimited` puts Codex at `xhigh`.
+
+**Defaults (step 5).** With Codex available, start from this block, replacing each `codex default` with the Codex model the user confirmed for that tier. Every panel lists both families. `pstack-economy` decides how many entries run: architect runners none at lean width, interrogate reviewers the one entry whose family differs from the author's, and arena runners both. The rest of upstream's roles keep their defaults, with each `grok-*` slug written as `codex default <effort>`.
+
+```
+arena runners: opus xhigh, codex default xhigh
+interrogate reviewers: opus xhigh, codex default xhigh
+architect runners: opus xhigh, codex default xhigh
+codex wrapper: haiku medium
+```
+
+Without Codex, the defaults are Claude-only: every `codex` entry becomes `inherit-parent`, and you say once that panels lose their second family.
+
+**Write (step 5).** Write `~/.claude/rules/pstack-models.md` as the adapter says. Start it with a `# Models this profile can reach` comment block, one `#` line per inventory model with its fields, then the `# budget` line and the role lines.
+
 ## Steps
 
 ### 1. Detect available models

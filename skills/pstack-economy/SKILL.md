@@ -18,7 +18,13 @@ Upstream pstack assumes model calls are cheap. Here they draw on two subscriptio
 - **Duplicated work:** several agents do the same piece. Examples are races, best-of, several candidates for one artifact, several reviewers with one prompt, repeated verification lanes, and periodic re-checks. Run the lean width below.
 - **Free-executor exemption (dormant).** Duplicated work may run on a free executor when its output stays advisory, meaning it never merges, dispatches, stands down, or decides. No executor in Claude Code is free today, so this exemption applies only if one is added to the inventory.
 
-For a duplicated-work panel role in `~/.claude/rules/pstack-models.md` (architect runners, arena runners, arena cross-judge pool, interrogate reviewers), use only the first entry, or the first two for arena runners, unless the user approved going wide. A longer list is the go-wide width, not the default.
+Panel roles in `~/.claude/rules/pstack-models.md` list both families. Without going wide, run only these entries:
+- architect runners: none, because the parent designs;
+- interrogate reviewers: the one entry whose family differs from the author's;
+- arena runners: the first two;
+- arena cross-judge pool: none, because the parent judges.
+
+The full list is the go-wide width, not the default.
 
 ## Lean widths
 

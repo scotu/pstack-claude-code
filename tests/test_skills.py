@@ -44,6 +44,39 @@ class EconomySkillTest(unittest.TestCase):
         self.assertIn("`codex:<model> <effort>`", text)
 
 
+def role(text: str, name: str) -> list[str]:
+    line = re.search(rf"^{re.escape(name)}: (.+)$", text, re.M)
+    return [entry.strip() for entry in line.group(1).split(",")] if line else []
+
+
+class SetupInventoryTest(unittest.TestCase):
+    def fork(self) -> str:
+        return skill("setup-pstack").split("## On this fork: inventory and two families\n", 1)[1]
+
+    def test_inventory_fields(self):
+        text = self.fork()
+        for needle in ("family", "tier", "tools", "executor", "cost class", "codex --version", "codex login status",
+                       "~/.claude/rules/pstack-models.md", "# Models this profile can reach"):
+            self.assertIn(needle, text)
+
+    def test_alternating_defaults(self):
+        text = self.fork()
+        for panel in ("arena runners", "interrogate reviewers", "architect runners"):
+            entries = role(text, panel)
+            self.assertEqual(len(entries), 2, panel)
+            self.assertFalse(entries[0].startswith("codex"), panel)
+            self.assertTrue(entries[1].startswith("codex "), panel)
+        self.assertIn("Claude-only", text)
+
+    def test_codex_effort_ladder_has_no_max(self):
+        self.assertIn("`xhigh` > `high` > `medium` > `low` > `minimal`", self.fork())
+
+    def test_economy_names_lean_runs_per_panel(self):
+        text = skill("pstack-economy")
+        self.assertIn("architect runners: none", text)
+        self.assertIn("interrogate reviewers: the one entry whose family differs", text)
+
+
 class OnAdapterHookTest(unittest.TestCase):
     def test_adapter_points_at_economy_early(self):
         head = "\n".join(ADAPTER.read_text().splitlines()[:15])
