@@ -17,7 +17,7 @@ SUBAGENT_TYPES = {"generalPurpose", "general-purpose", "Explore", "poteto-agent"
 
 def docs():
     for md in sorted(list(SKILLS.rglob("*.md")) + list((ROOT / "agents").glob("*.md"))):
-        if not any(md.is_relative_to(p) for p in POLICY):
+        if "node_modules" not in md.parts and not any(md.is_relative_to(p) for p in POLICY):
             yield md, md.read_text()
 
 
