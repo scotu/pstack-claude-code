@@ -72,4 +72,33 @@ When Codex is unavailable (see `pstack-codex`), every seat runs on Claude, and y
 
 ## Audit tick
 
-A program's audit tick is a background watcher script that does the mechanical liveness checks with no model involved, and wakes you only when something changes. The section below covers how to arm it, and its full procedure ships with this skill in `audit-watch/`. The hourly `/loop 1h` tick is the going-wide form only.
+A program's audit tick is a background watcher script. It does the mechanical liveness checks with no model involved, and wakes you only when something changes. Arm it on the operator's go. The hourly `/loop 1h` tick is the going-wide form only.
+
+1. **Program dir.** Create `~/.claude/pstack-programs/<program>/`, outside any repo checkout. Write `plan.txt` there: the plan path, the execution playbook, and this session. The same dir is the agent store that skills mention.
+2. **`owners.tsv`.** Write it in the program dir, tab-separated, with this header: `owner remote repo branch pr expected_minutes started_at executor job worktree`.
+   - `remote` is the git URL, and `repo` is `owner/name` for `gh`.
+   - `pr` is the PR number, or `-` before the PR exists.
+   - `expected_minutes` and `started_at` (epoch seconds) are integers.
+   - `executor` is `claude` or `codex`.
+   - `job` is the agent id, or for a Codex pair `<codex job id>+<wrapper agent id>`.
+   - `worktree` is the owner's worktree path, or `-`.
+   - Blank rows and `#` rows are ignored.
+   - Update it whenever an owner spawns, opens its PR, or finishes.
+3. **Arm the watcher.** Copy `audit-watch/pstack-audit-watch.py` from this skill's folder into the program dir. From the program dir, start `python3 pstack-audit-watch.py --watch --interval 900` with Bash `run_in_background`.
+   - It records a baseline, then checks every 15 minutes.
+   - It prints nothing and costs nothing while nothing changes.
+   - It exits, printing the changed owner lines, when a head moves, checks change, a bot comments, a Codex job ends, or an owner goes STUCK.
+
+   Never use Monitor for this. A Monitor watch expires within 30 minutes, and re-arming it costs a turn every time.
+4. **Check that it works.** Run `python3 pstack-audit-watch.py --once` once before arming. It must print one line per owner and no `ERROR` line. Fix the script path, `gh auth status`, or `owners.tsv` until it does.
+5. **On wake.** The exit notification names the owners concerned. For those owners only, run the judgment half of the playbook's audit tick:
+   - re-read the playbook;
+   - fix drift;
+   - stand down and replace stuck owners;
+   - handle failed checks and bot comments;
+   - for a Codex pair whose job is `done`, make sure its wrapper commits.
+
+   Then arm the watcher again. It starts from the state it reported.
+6. **Teardown.** When no delegated work is left, don't re-arm, and delete the program dir.
+
+The watcher lives as long as this session. Closing the session ends the watcher and the owners together, by design.

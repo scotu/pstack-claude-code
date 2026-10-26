@@ -52,3 +52,10 @@ Why: one hook makes the economy policy reach every skill without editing each.
 Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
 Touches: docs/harness/claude-code.md
 Check: python3 -m unittest tests.test_skills.OnAdapterHookTest passes
+
+## C-005 — audit tick: background watcher instead of an hourly root loop  [active]
+Intent: programs arm a background watcher (pstack-audit-watch.py --watch via Bash run_in_background, never Monitor) that does mechanical liveness checks for free and exits only on a change, waking the root for the judgment half; the hourly /loop 1h root tick only when going wide. check-plan.mjs accepts /loop 1h or pstack-audit-watch as the program marker.
+Why: an hourly tick on a subscription model re-audits unchanged state; mechanical checks need no model, and judgment is needed only when something changed.
+Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
+Touches: skills/pstack-economy/SKILL.md, skills/pstack-economy/audit-watch/
+Check: python3 -m unittest tests.test_audit_watch passes
