@@ -45,3 +45,10 @@ Why: both Claude Code and Codex are subscription quotas; the saving comes from s
 Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
 Touches: skills/pstack-economy/SKILL.md, tests/test_skills.py
 Check: python3 -m unittest tests.test_skills.EconomySkillTest passes
+
+## C-002 — adapter: route every fan-out through pstack-economy  [active]
+Intent: the Claude Code adapter, which pstack skills read once per session, tells the agent to read and apply pstack-economy before any fan-out, loop, or role-model choice, and to give its lean widths when explaining cost or widths.
+Why: one hook makes the economy policy reach every skill without editing each.
+Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
+Touches: docs/harness/claude-code.md
+Check: python3 -m unittest tests.test_skills.OnAdapterHookTest passes
