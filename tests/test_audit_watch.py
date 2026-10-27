@@ -267,6 +267,57 @@ class WatchLoopTest(AuditWatchTest):
         (self.cx / "job1.json").unlink()
         self.assertIn(" codex=unknown", self.watch(1100))
 
+    def codex_owner(self):
+        self.owners(f"owner-a\t{self.remote}\tme/demo\tfeat-a\t7\t40\t1000\tcodex\tjob1+agent9\t{self.work}\n")
+
+    def test_codex_done_without_commit_flags_uncommitted(self):
+        self.codex_owner()
+        self.codex_job("completed")
+        self.assertNotIn("UNCOMMITTED", self.watch(1100))
+        self.assertNotIn("UNCOMMITTED", self.watch(1100 + 9 * 60))
+        self.assertTrue(self.watch(1100 + 11 * 60).rstrip().endswith(" UNCOMMITTED"))
+
+    def test_uncommitted_clears_on_push(self):
+        self.codex_owner()
+        self.codex_job("completed")
+        self.watch(1100)
+        self.assertIn("UNCOMMITTED", self.watch(1100 + 11 * 60))
+        self.push("2")
+        self.assertNotIn("UNCOMMITTED", self.watch(1100 + 12 * 60))
+
+    def test_new_round_resets_uncommitted(self):
+        self.codex_owner()
+        self.codex_job("completed")
+        self.watch(1100)
+        self.codex_job("running")
+        self.watch(1100 + 5 * 60)
+        self.codex_job("completed")
+        self.assertNotIn("UNCOMMITTED", self.watch(1100 + 12 * 60))
+
+    def test_baseline_reports_uncommitted(self):
+        self.codex_owner()
+        self.codex_job("completed")
+        os.environ["PSTACK_AUDIT_NOW"] = "1100"
+        self.mod.snapshot(self.program)
+        os.environ["PSTACK_AUDIT_NOW"] = str(1100 + 11 * 60)
+        try:
+            alarms = self.mod.watch(self.program, interval=0, max_cycles=1)
+        finally:
+            os.environ.pop("PSTACK_AUDIT_NOW")
+        self.assertEqual(len(alarms), 1)
+        self.assertIn("UNCOMMITTED", alarms[0])
+
+    def test_transient_unknown_is_not_a_change(self):
+        good = f"owner-a\t{self.remote}\tme/demo\tfeat-a\t7\t40\t1000{CLAUDE}\n"
+        flaky = f"owner-a\t{self.remote}-gone\tme/demo\tfeat-a\t7\t40\t1000{CLAUDE}\n"
+        self.mod.watch(self.program, interval=0, max_cycles=1)
+        cycles = []
+
+        def sleep(_):
+            cycles.append(1)
+            self.owners(flaky if len(cycles) == 1 else good)
+        self.assertEqual(self.mod.watch(self.program, interval=0, max_cycles=3, sleep=sleep), [])
+
     def test_claude_owner_has_no_codex_field(self):
         self.assertNotIn("codex=", self.watch(1100))
 

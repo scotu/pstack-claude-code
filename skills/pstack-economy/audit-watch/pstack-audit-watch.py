@@ -5,17 +5,20 @@ Runs in the program dir. Reads owners.tsv (tab-separated, header row):
   owner  remote  repo  branch  pr  expected_minutes  started_at  executor  job  worktree
 and builds one stable line per owner, with no timestamps:
   <owner> branch=<branch> head=<sha7|missing|unknown> expected=<n>m checks=<pass|pending|fail|none|unknown|nopr>
-  bot_comments=<n|unknown|nopr> [codex=<running|done|failed|cancelled|unknown|->] [STUCK]
+  bot_comments=<n|unknown|nopr> [codex=<running|done|failed|cancelled|unknown|->] [STUCK] [UNCOMMITTED]
 `codex=` appears for executor `codex`. Its job is `<codex job id>+<wrapper agent id>`, read with the Codex
 companion's `status <job> --cwd <worktree> --json`. Blank rows and rows starting with # are skipped. STUCK means
 both the owner and its last known head have been idle longer than expected_minutes; an `unknown` head (a failed
-ls-remote) leaves that timer alone. bot_comments counts comments, inline review comments and reviews whose author
-is a GitHub Bot account.
+ls-remote) leaves that timer alone. UNCOMMITTED means the Codex job has been done for over 10 minutes and the
+branch head has not moved since, so its wrapper never committed. bot_comments counts comments, inline review comments
+and reviews whose author is a GitHub Bot account.
 
   --once (default)   print the lines and exit 0
   --watch            loop: sleep --interval seconds (default 900), rebuild the lines, and exit 0 printing only the
-                     lines that changed since the last report. Stays silent while nothing changes. The first run
-                     records a baseline and reports only STUCK or ERROR lines in it.
+                     lines that changed since the last report. Stays silent while nothing changes, and a field that
+                     reads `unknown` (a failed git or gh call) counts as its last reported value, so a transient
+                     failure wakes nobody. The first run records a baseline and reports only STUCK, UNCOMMITTED or
+                     ERROR lines in it.
 
 State lives in .pstack-audit-state.json (when each head was first seen) and .pstack-audit-last.txt (the lines last
 reported). PSTACK_AUDIT_NOW overrides the clock, PSTACK_CODEX_COMPANION the companion script, for tests.
@@ -36,6 +39,7 @@ OWNERS = "owners.tsv"
 STATE = ".pstack-audit-state.json"
 LAST = ".pstack-audit-last.txt"
 COLUMNS = 10
+UNCOMMITTED_GRACE = 10 * 60  # seconds a finished Codex job may wait for its wrapper's commit
 COMPANION = "~/.claude/plugins/cache/openai-codex/codex/*/scripts/codex-companion.mjs"
 CODEX_STATES = {"queued": "running", "running": "running", "completed": "done", "failed": "failed",
                 "cancelled": "cancelled", "canceled": "cancelled"}
@@ -155,31 +159,53 @@ def snapshot(program: Path, now: int | None = None) -> list[str]:
             status = "checks=nopr bot_comments=nopr"
         else:
             status = f"checks={checks(repo, pr)} bot_comments={bot_comments(repo, pr)}"
+        uncommitted = False
         if executor == "codex":
-            status += f" codex={codex(job, worktree)}"
-        lines.append(f"{owner} branch={branch} head={sha} expected={minutes}m {status}" + (" STUCK" if stuck else ""))
+            cx = codex(job, worktree)
+            status += f" codex={cx}"
+            jobs = state.get("codex")
+            if not isinstance(jobs, dict):
+                jobs = state["codex"] = {}
+            if cx == "done":
+                done = jobs.get(owner) if isinstance(jobs.get(owner), dict) else None
+                if done is None or done.get("job") != job:
+                    done = jobs[owner] = {"job": job, "head": sha, "at": now}
+                uncommitted = done["head"] == sha and now - done["at"] > UNCOMMITTED_GRACE
+            elif cx != "unknown":
+                jobs.pop(owner, None)
+        lines.append(f"{owner} branch={branch} head={sha} expected={minutes}m {status}"
+                     + (" STUCK" if stuck else "") + (" UNCOMMITTED" if uncommitted else ""))
     (program / STATE).write_text(json.dumps(state, indent=1, sort_keys=True))
     return lines
+
+
+def settle(line: str, previous: dict[str, str]) -> str:
+    """The line with each `unknown` field replaced by the owner's last reported value of that field."""
+    owner, _, rest = line.partition(" ")
+    before = dict(f.split("=", 1) for f in previous.get(owner, "").split(" ")[1:] if "=" in f)
+    fields = [f"{f.split('=', 1)[0]}={before[f.split('=', 1)[0]]}"
+              if f.endswith("=unknown") and f.split("=", 1)[0] in before else f for f in rest.split(" ")]
+    return " ".join([owner, *fields])
 
 
 def watch(program: Path, interval: int = 900, max_cycles: int | None = None, sleep=time.sleep) -> list[str]:
     """Return (and record) the lines that changed since the last report; [] if max_cycles ran out quietly."""
     last_file = program / LAST
     if last_file.exists():
-        last = set(last_file.read_text().splitlines())
+        last = last_file.read_text().splitlines()
     else:
-        first = snapshot(program)
-        last_file.write_text("\n".join(first))
-        alarms = [line for line in first if line.startswith("ERROR") or line.endswith(" STUCK")]
+        last = snapshot(program)
+        last_file.write_text("\n".join(last))
+        alarms = [line for line in last if line.startswith("ERROR") or line.endswith((" STUCK", " UNCOMMITTED"))]
         if alarms:
             return alarms
-        last = set(first)
+    previous = {line.partition(" ")[0]: line for line in last}
     cycles = 0
     while max_cycles is None or cycles < max_cycles:
         cycles += 1
         sleep(interval)
         lines = snapshot(program)
-        changed = [line for line in lines if line not in last]
+        changed = [line for line in lines if settle(line, previous) not in last]
         if changed:
             last_file.write_text("\n".join(lines))
             return changed
