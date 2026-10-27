@@ -12,7 +12,7 @@ Answer the user's question about pstack, hand them a prompt they can send, and l
 
 A message that asks for work, such as "use pstack to fix this bug", is not a help question. Read [`poteto-mode`](../poteto-mode/SKILL.md), do the work under it, and mention once that a Custom Mode keeps it on.
 
-This file maps questions to the skills and guide pages that hold the answers. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map. The links here point into the installed plugin, which the user may not be able to open, so give the user the file's public copy: `https://github.com/cursor/plugins/blob/c5149ef275fa7be41e3ffe5e79c8fc16efcaeedc/pstack/` followed by its path.
+This file maps questions to the skills and guide pages that hold the answers. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map. The links here point into the installed plugin, which the user may not be able to open, so give the user the file's public copy: `https://github.com/cursor/plugins/blob/ab69380dd50ee47d426b35cb8369cffdddafc218/pstack/` followed by its path.
 
 ## Find out what they need
 
@@ -99,7 +99,7 @@ The default answer is `/poteto-mode`, which runs most of the others when its ste
 | Turn their own working habits into a personal mode skill | [`/automate-me`](../automate-me/SKILL.md) |
 | Turn what a finished task taught into skill edits | [`/reflect`](../reflect/SKILL.md) |
 | Stop agents from repeating the same mistakes in this repo | [`/correct`](../correct/SKILL.md) |
-| Build a page whose buttons wake a Grok Bot over a webhook | [`/make-bot-ui`](https://github.com/cursor/plugins/blob/c5149ef275fa7be41e3ffe5e79c8fc16efcaeedc/harness/pstack/claude-code/skills/make-bot-ui/SKILL.md) |
+| Build a page whose buttons wake a Grok Bot over a webhook | [`/make-bot-ui`](https://github.com/cursor/plugins/blob/ab69380dd50ee47d426b35cb8369cffdddafc218/harness/pstack/claude-code/skills/make-bot-ui/SKILL.md) |
 | Find their way around pstack | `/poteto-help` |
 
 If a skill directory next to this one is missing from the table, read its frontmatter and route by its description. The `principle-*` directories are covered under principles below.
