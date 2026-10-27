@@ -38,6 +38,11 @@ class EconomySkillTest(unittest.TestCase):
         self.assertRegex(routing, r"Divided work[^.]*not required to mix")
         self.assertNotIn("cheapest executor", routing)
 
+    def test_missing_inventory_keeps_codex_for_non_claude_seats(self):
+        routing = skill("pstack-economy").split("## Routing\n", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("a seat whose default slug is non-Claude goes to Codex", routing)
+        self.assertNotIn("treat every role as Claude on the session model", routing)
+
     def test_executors(self):
         text = skill("pstack-economy")
         self.assertIn("`agent:<opus|sonnet|haiku|fable> <effort>`", text)

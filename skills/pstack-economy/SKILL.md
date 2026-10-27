@@ -54,7 +54,7 @@ Then wait for an explicit yes. "Go wide", "spare no expense", or a named width f
 
 ## Routing
 
-`~/.claude/rules/pstack-models.md` starts with an inventory written by `setup-pstack`: model, family (`claude` or `codex`), tier (`frontier`, `strong`, `light`), `tools` (yes or no), executor, and cost class. If the inventory is missing, treat every role as Claude on the session model, say so once, and suggest running `/pstack:setup-pstack`.
+`~/.claude/rules/pstack-models.md` starts with an inventory written by `setup-pstack`: model, family (`claude` or `codex`), tier (`frontier`, `strong`, `light`), `tools` (yes or no), executor, and cost class. If the inventory is missing, use the skills' default slugs as the adapter maps them: a Claude seat runs on the session model, and a seat whose default slug is non-Claude goes to Codex when it is available (`pstack-codex`). Say so once, and suggest running `/pstack:setup-pstack`.
 
 **Executors:**
 - `parent`: this session.
@@ -93,7 +93,7 @@ A program's audit tick is a background watcher script. It does the mechanical li
 3. **Arm the watcher.** Copy `audit-watch/pstack-audit-watch.py` from this skill's folder into the program dir. From the program dir, start `python3 pstack-audit-watch.py --watch --interval 900` with Bash `run_in_background`.
    - It records a baseline, then checks every 15 minutes.
    - It prints nothing and costs nothing while nothing changes.
-   - It exits, printing the changed owner lines, when a head moves, checks change, a bot comments, a Codex job ends, or an owner goes STUCK.
+   - It exits, printing the changed owner lines, when a head moves, checks change, a bot comments, a Codex job ends, an owner goes STUCK, or a finished Codex job stays uncommitted for 10 minutes (UNCOMMITTED). A transient `unknown` from git or gh is not a change.
 
    Never use Monitor for this. A Monitor watch expires within 30 minutes, and re-arming it costs a turn every time.
 4. **Check that it works.** Run `python3 pstack-audit-watch.py --once` once before arming. It must print one line per owner and no `ERROR` line. Fix the script path, `gh auth status`, or `owners.tsv` until it does.
