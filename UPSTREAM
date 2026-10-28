@@ -1,4 +1,4 @@
 repo: https://github.com/cursor/plugins
 path: harness/pstack/claude-code
-ref: ab69380dd50ee47d426b35cb8369cffdddafc218
-commit: ab69380dd50ee47d426b35cb8369cffdddafc218
+ref: main
+commit: 6f6c9e62585436f69e560138d46709026fa5c69f
