@@ -24,7 +24,7 @@ This build runs on Claude Code with Codex as a second model family. These rules 
   - cost class: `subscription` unless the user says otherwise.
 - **Recommend slots.** `frontier` for judgment, a `strong` model from each family for code-writing and review, and a `light` Claude model (`haiku` or `sonnet`) for the Codex wrapper.
 
-**Budget (step 3).** Claude models use the adapter's ladder. Codex efforts are `xhigh` > `high` > `medium` > `low` > `minimal`, with no `max`, so `unlimited` puts Codex at `xhigh`.
+**Budget (step 3).** Claude models use the adapter's ladder. Codex efforts are `max` > `xhigh` > `high` > `medium` > `low` > `minimal`, limited to the levels each model lists under `supported_reasoning_levels` in `~/.codex/models_cache.json`. A model without `max` falls back to `xhigh`, so `unlimited` puts Codex at `max` where the model has it. `ultra` stays out of the ladder: it adds Codex's own delegation, and a Codex seat is a leaf.
 
 **Defaults (step 5).** With Codex available, start from this block, replacing each `codex default` with the Codex model the user confirmed for that tier. Every panel lists both families. `pstack-economy` decides how many entries run: architect runners none at lean width, interrogate reviewers the one entry whose family differs from the author's, and arena runners both. The rest of upstream's roles keep their defaults, with each `grok-*` slug written as `codex default <effort>`.
 
@@ -38,6 +38,11 @@ codex wrapper: haiku medium
 Without Codex, the defaults are Claude-only: every `codex` entry becomes `inherit-parent`, and you say once that panels lose their second family.
 
 **Write (step 5).** Write `~/.claude/rules/pstack-models.md` as the adapter says. Start it with a `# Models this profile can reach` comment block, one `#` line per inventory model with its fields, then the `# budget` line and the role lines.
+
+**When chezmoi manages `~/.claude`** (`chezmoi source-path ~/.claude` succeeds), write the rule into the chezmoi source, because `chezmoi apply` would overwrite the target or flag it as drift.
+- The file is `chezmoi source-path ~/.claude/rules/pstack-models.md` when the rule is already managed. Otherwise it is `pstack-models.md.tmpl` in the `rules/` folder under `chezmoi source-path ~/.claude`. Keep an existing file's name.
+- In a `.tmpl`, put each Codex entry behind `{{ if lookPath "codex" }}`, with `inherit-parent` in the `else` branch, so a machine without Codex renders Claude-only panels.
+- Check it with `chezmoi execute-template`, then ask the user to review it and run `chezmoi apply`. The rule applies from the next session after that.
 
 ## Steps
 

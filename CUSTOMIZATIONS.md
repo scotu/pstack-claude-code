@@ -13,7 +13,7 @@ Each change has one entry. Its commits start with its ID, for example `C-001: �
 
 A clean merge only means no customization collided with upstream. New or reworded upstream text can still break these rules. Every file on `main` must follow them, including files upstream adds later. Each active entry's Intent is one of them: `Touches:` lists the files the entry edited, but the Intent applies to every file.
 
-- **P-1 Lean by default (C-001 to C-005).** Duplicated agent work runs at pstack-economy's lean width unless the operator approves going wide. Duplicated work means races, best-of, same-prompt panels, repeated verification lanes, and periodic re-checks. Divided work runs as upstream wrote it. A recurring audit tick is the background watcher. `/loop 1h` and ten lanes appear only as the going-wide form. A new duplicated-work pattern gets a row in pstack-economy's Lean widths. A new panel role also gets a lean default in setup-pstack. Duplicated-work seats at lean width, and every author/verifier pair, draw on both model families when Codex is available.
+- **P-1 Lean by default (C-001 to C-006).** Duplicated agent work runs at pstack-economy's lean width unless the operator approves going wide. Duplicated work means races, best-of, same-prompt panels, repeated verification lanes, and periodic re-checks. Divided work runs as upstream wrote it. A recurring audit tick is the background watcher. `/loop 1h` and ten lanes appear only as the going-wide form. A new duplicated-work pattern gets a row in pstack-economy's Lean widths. A new panel role also gets a lean default in setup-pstack. Duplicated-work seats at lean width, and every author/verifier pair, draw on both model families when Codex is available.
 - **P-2 Runs on Claude Code.** Every tool, feature, skill, plugin, subagent type, model slug and path that a skill names either exists in Claude Code or has a mapping in the adapter (`docs/harness/claude-code.md`, including its Codex section) or in `pstack-codex`. Nothing points at a file the tree leaves out. Fix gaps in agent-plugin-factory's port hook or overlay (`plugins/pstack/claude-code/`), so the fix reaches every later build.
 - **P-3 Intents apply to the whole tree.** An entry's `Touches:` lists the files it edited. Its Intent is a rule for every file.
 
@@ -61,7 +61,7 @@ Touches: skills/pstack-economy/SKILL.md, skills/pstack-economy/audit-watch/, ski
 Check: python3 -m unittest tests.test_audit_watch tests.test_check_plan tests.test_principles.EconomyPrincipleTest passes
 
 ## C-003 — setup-pstack: two-family inventory and panel defaults  [active]
-Intent: setup-pstack builds a confirmed inventory of Claude and Codex models (family, tier, tools, executor, cost class), detects Codex with codex --version and codex login status, uses a Codex effort ladder without max, writes ~/.claude/rules/pstack-models.md with the inventory as comment lines, and defaults every panel (arena runners, interrogate reviewers, architect runners) to one Claude and one Codex entry, with grok slugs written as codex default; Claude-only with a note when Codex is missing. pstack-economy names how many panel entries run at lean width.
+Intent: setup-pstack builds a confirmed inventory of Claude and Codex models (family, tier, tools, executor, cost class), detects Codex with codex --version and codex login status, uses the Codex effort ladder that C-007 defines, writes ~/.claude/rules/pstack-models.md with the inventory as comment lines, and defaults every panel (arena runners, interrogate reviewers, architect runners) to one Claude and one Codex entry, with grok slugs written as codex default; Claude-only with a note when Codex is missing. pstack-economy names how many panel entries run at lean width.
 Why: model diversity across families is the point of the panels; lean widths keep the cost down.
 Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
 Touches: skills/setup-pstack/SKILL.md, skills/pstack-economy/SKILL.md
@@ -73,3 +73,15 @@ Why: ten lanes repeat about five distinct checks; the repeats spend quota withou
 Spec: https://github.com/scotu/agent-plugin-factory/blob/main/docs/specs/2026-10-26-pstack-claude-code-design.md
 Touches: skills/poteto-mode/scripts/check-plan.mjs, skills/poteto-mode/playbooks/multi-phase-plan.md
 Check: python3 -m unittest tests.test_check_plan tests.test_principles.EconomyPrincipleTest passes
+
+## C-006 — arena: cross-family judge only at hardest-tasks difficulty  [active]
+Intent: a lean arena (one Claude and one Codex candidate) is judged by the parent alone, and its synthesis note says the judgment is same-family for the parent's own candidate; when the task is at `hardest tasks` difficulty (cross-cutting design, gnarly concurrency, subtle algorithms), one read-only cross-judge from the family that is not the parent's judges too, from the arena cross-judge pool. Wider judging only when going wide.
+Why: in the first live arena the Claude parent judged and picked the Claude candidate; a second-family judge is worth one Codex run on hard work, not on every arena.
+Touches: skills/pstack-economy/SKILL.md, tests/test_skills.py
+Check: python3 -m unittest tests.test_skills.SetupInventoryTest.test_arena_cross_judge_only_for_hardest_tasks passes
+
+## C-007 — setup-pstack: per-model Codex efforts, rule through chezmoi  [active]
+Intent: the Codex effort ladder is max > xhigh > high > medium > low > minimal, limited to each model's supported_reasoning_levels in ~/.codex/models_cache.json, never ultra (it delegates; Codex seats are leaves); max seats run through codex exec because the companion stops at xhigh. When chezmoi manages ~/.claude, setup-pstack writes the model rule into the chezmoi source (a .tmpl with Codex entries behind lookPath "codex") and asks the user to apply it.
+Why: Codex models now report max and ultra; the user's ~/.claude is chezmoi-managed, and writing the target directly drifts.
+Touches: skills/setup-pstack/SKILL.md, CUSTOMIZATIONS.md, tests/test_skills.py
+Check: python3 -m unittest tests.test_skills.SetupInventoryTest passes
