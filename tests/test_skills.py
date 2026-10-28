@@ -73,13 +73,31 @@ class SetupInventoryTest(unittest.TestCase):
             self.assertTrue(entries[1].startswith("codex "), panel)
         self.assertIn("Claude-only", text)
 
-    def test_codex_effort_ladder_has_no_max(self):
-        self.assertIn("`xhigh` > `high` > `medium` > `low` > `minimal`", self.fork())
+    def test_codex_effort_ladder_follows_the_model(self):
+        text = self.fork()
+        self.assertIn("`max` > `xhigh` > `high` > `medium` > `low` > `minimal`", text)
+        self.assertIn("~/.codex/models_cache.json", text)
+        self.assertIn("`ultra`", text)
+        self.assertNotIn("with no `max`", text)
+
+    def test_rule_goes_through_chezmoi_when_managed(self):
+        text = self.fork()
+        self.assertIn("chezmoi source-path", text)
+        self.assertIn("pstack-models.md.tmpl", text)
+        self.assertIn("chezmoi apply", text)
 
     def test_economy_names_lean_runs_per_panel(self):
         text = skill("pstack-economy")
         self.assertIn("architect runners: none", text)
         self.assertIn("interrogate reviewers: the one entry whose family differs", text)
+
+    def test_arena_cross_judge_only_for_hardest_tasks(self):
+        text = skill("pstack-economy")
+        self.assertIn("arena cross-judge pool: the one entry whose family differs from the parent's, only when the "
+                      "task is at `hardest tasks` difficulty", text)
+        arena = [row for row in text.splitlines() if row.startswith("| arena |")][0]
+        self.assertIn("`hardest tasks`", arena)
+        self.assertIn("same-family", arena)
 
 
 class OnAdapterHookTest(unittest.TestCase):

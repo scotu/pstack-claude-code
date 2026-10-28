@@ -22,7 +22,7 @@ Panel roles in `~/.claude/rules/pstack-models.md` list both families. Without go
 - architect runners: none, because the parent designs;
 - interrogate reviewers: the one entry whose family differs from the author's;
 - arena runners: the first two;
-- arena cross-judge pool: none, because the parent judges.
+- arena cross-judge pool: the one entry whose family differs from the parent's, only when the task is at `hardest tasks` difficulty (cross-cutting design, gnarly concurrency, subtle algorithms: the changes poteto-mode sends to `hardest tasks`). Below that, none, and the parent judges.
 
 The full list is the go-wide width, not the default.
 
@@ -33,7 +33,7 @@ The full list is the go-wide width, not the default.
 | swarm, coverage slices | one worker per slice, no cap | — |
 | swarm, races and best-of | no race, one worker per arm | upstream races |
 | architect | one design by the parent that names the alternatives it rejected and why, with no runners | 2 to 3 runners |
-| arena | 2 candidates, one per family when Codex is available, judged by the parent against the rubric, with no separate cross-judge | 3 candidates plus a cross-judge |
+| arena | 2 candidates, one per family when Codex is available, judged by the parent against the rubric. At `hardest tasks` difficulty, one read-only cross-judge from the family that is not the parent's judges too. A parent-only judgment is same-family for the parent's own candidate, so the synthesis note says so | 3 candidates plus a cross-judge |
 | interrogate | 1 reviewer from the family that did not write the code | one reviewer per configured model |
 | reflect, why, how, poteto-mode subagents | as upstream (divided work) | — |
 | live verification | one lane per distinct check, with no repeats | ten lanes |
@@ -71,7 +71,7 @@ Both families are `subscription`. No executor is `per-token` unless the inventor
 **Rule:**
 1. **Meet the role's tier.**
 2. **Mix families for duplicated work.** When a duplicated-work step has two or more seats at lean width, draw them from both families. For example, arena's 2 candidates are one Claude and one Codex.
-3. **Cross families between author and verifier.** A single reviewer, judge or verifier comes from the family that did not write the work.
+3. **Cross families between author and verifier.** A single reviewer, judge or verifier comes from the family that did not write the work. In an arena both families wrote candidates, so its cross-judge is the family that is not the parent's.
 4. **Otherwise, use headroom.** At equal tier, prefer the family with more quota headroom when you know it, else the session's family. Divided work picks per seat this way, and it is not required to mix.
 
 When Codex is unavailable (see `pstack-codex`), every seat runs on Claude, and you say in one line which step lost its second family.
